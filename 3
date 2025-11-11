@@ -1,0 +1,76 @@
+#include <stdio.h>
+#define max 10
+int tat[max],at[max],bt[max],ct[max],wt[max],st[max];
+int n;
+int process[max];
+int avgtat=0,avgwt=0;
+int main(){
+printf("enter no of processes:");
+scanf("%d",&n);
+for(int i=0;i<n;i++){
+    process[i]=i;
+    printf("enter at for p%d",i);
+    scanf("%d",&at[i]);
+    printf("enter bt for p%d",i);
+    scanf("%d",&bt[i]);
+    tat[i]=0;
+    wt[i]=0;
+}
+for(int i=0;i<n-1;i++){
+    for(int j=i+1;j<n;j++){
+        int temp;
+        if(at[j]<at[i]){
+            temp=at[i];
+            at[i]=at[j];
+            at[j]=temp;
+            temp=bt[i];
+            bt[i]=bt[j];
+            bt[j]=temp;
+            temp=process[i];
+            process[i]=process[j];
+            process[j]=temp;
+        }
+    }
+}
+//calculte times 
+for(int i=0;i<n;i++){
+    if(i==0){
+        st[i]=at[i];//at=st nahi st=at vedi 
+        ct[i]=at[i]+bt[i];
+    }
+    else{
+        //idle 
+        if(ct[i-1] < at[i]){//no equal to but "<"
+            st[i]=at[i];//and not ct[i-1] idiot 
+        }
+        else{//not idle 
+            //st[i]=at[i];-> note why wrong : as process baadme complete hogi and pehle se already ek process aa chuki hai so we wait for prev process to finish and then continue with the new one 
+            st[i]=ct[i-1];
+        }
+        //else cha common 
+        ct[i]=st[i]+bt[i];//plus
+    }
+    //common to all is tca,wtb,avgs 
+    tat[i]=ct[i]-at[i];//minus 
+    wt[i]=tat[i]-bt[i];
+    avgtat+=tat[i];
+    avgwt+=wt[i];
+}
+
+printf("process\tat\tbt\tct\twt\ttat");
+
+for(int i=0;i<n;i++){
+    printf("\t\n");
+    printf("%d",process[i]);
+    printf("\t%d",at[i]);
+    printf("\t%d",bt[i]);
+    printf("\t%d",ct[i]);
+    printf("\t%d",wt[i]);
+    printf("\t%d",tat[i]);
+    printf("\t\n");
+}
+printf("average turn around time : %.2f",(float)avgtat/n);
+printf("average waiting time : %.2f",(float)avgwt/n);
+    return 0;
+}
+ 
