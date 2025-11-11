@@ -1,0 +1,74 @@
+#include <stdio.h>
+#define max 10
+int n,f;
+int refstring[max];//pages
+int frames[max];//  ={-1}-> wrong initialise in main 
+
+int isPresent(int page){
+    for(int i=0;i<f;i++){
+        if(frames[i]==page){
+            return 1;
+        }
+    }
+    return 0;
+}
+int k=0;
+// int pagehits=0;
+// int pagefaults=0;
+
+void pagereplacementalgo(int n){
+    int pagehits=0;
+    int pagefaults=0;
+    int emptyindex=0;
+    
+    for(int i=0;i<n;i++){
+    if(isPresent(refstring[i])){
+        pagehits++;
+        printf("[");
+        for(int j=0;j<f;j++){
+            printf("%d",frames[j]);
+        }
+        printf("]");
+        printf("->page hit");
+    }
+    else{
+        pagefaults++;
+        frames[k]=refstring[i];
+        k=(k+1)%f;
+        printf("[");
+        for(int j=0;j<f;j++){
+            printf("%d",frames[j]);
+        }
+        printf("]");
+        printf("->page fault");
+    }
+    
+    }
+    printf("number of page hits: %d",pagehits);
+       printf("page hit ratio: %.2f",(float)pagehits/n);
+       printf("number of page faults: %d",pagefaults);
+       printf("page fault ratio : %.2f",(float)pagefaults/n);
+}
+
+int main(){
+
+    printf("enter no of pages" );
+    scanf("%d",&n);
+    printf("enter ref string");
+    for(int i=0;i<n;i++){
+        scanf("%d",&refstring[i]);
+    }
+    printf("enter no of frames" );
+    scanf("%d",&f);
+    for(int i=0;i<f;i++){
+        frames[i]=-1;
+    }
+    pagereplacementalgo(n);
+    //putting ratio in main as n ki value not available in pagereplacementalgo func -> gives zero 
+    // printf("number of page hits: %d",pagehits);
+    //   printf("page hit ratio: %d",pagehits/n);
+    //   printf("number of page faults: %d",pagefaults);
+    //   printf("page fault ratio : %d",pagefaults/n);
+    return 0;
+}
+ 
