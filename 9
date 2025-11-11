@@ -1,0 +1,124 @@
+#include <stdio.h>	
+#include <string.h>
+#define max 10
+int n,f;
+int refstring[max];//pages
+int frames[max];//  ={-1}-> wrong initialise in main 
+
+int isPresent(int page){
+    for(int i=0;i<f;i++){
+        if(frames[i]==page){
+            return 1;
+        }
+    }
+    return 0;
+}
+int findLRU(int indexofcurrentrefstring){
+    int pos;
+    int farthest=indexofcurrentrefstring;
+    for(int i=0;i<f;i++){
+        int j=indexofcurrentrefstring;
+        for(j=indexofcurrentrefstring-1;j>=0;j--){// j-1 nahi but j=indexofcurrentrefstring-1
+            if(refstring[j]==frames[i])
+            break;
+        }
+        if(j<farthest){
+            farthest=j;
+            pos=i;
+        }
+        
+    }
+    return pos;
+}
+void pagereplacementalgo( int n ){
+    int emptyindex=0;
+    int pagehits=0;
+    int pagefaults=0;
+    for(int i=0;i<n;i++){
+        if(emptyindex<f){//empty < n nahi pagal f 
+            //for(int j=0;j<f;j++){
+                if(isPresent(refstring[i])==0){
+                    pagefaults++;
+                    frames[emptyindex]=refstring[i];
+                    emptyindex++;
+                    printf("[");
+                    for(int j=0;j<f;j++){
+                        printf("%d",frames[j]);
+                    }
+                    printf("]");
+                    printf("->pagefault");
+                }
+                else{
+                    pagehits++;
+                    printf("[");
+                    for(int j=0;j<f;j++){
+                        printf("%d",frames[j]);
+                    }
+                    printf("]");
+                    printf("->pagehit");
+                }
+                
+            }
+        
+        else{//all frames filled in now time for replacement 
+            if(!isPresent(refstring[i])){
+                    pagefaults++;
+            int pos=findLRU(i);
+            frames[pos]=refstring[i];
+            for(int j=0;j<f;j++){
+                        printf("%d",frames[j]);
+                    }
+                    printf("]");
+                    printf("->pagefault");
+            
+            }
+            else{
+                pagehits++;
+                printf("[");
+                    for(int j=0;j<f;j++){
+                        printf("%d",frames[j]);
+                    }
+                    printf("]");
+                    printf("->pagehit");
+            }
+        }
+    }
+       //putting argument as n ki value not available in pagereplacementalgo func -> gives zero 
+    printf("number of page hits: %d",pagehits);
+       printf("page hit ratio: %d",pagehits/n);
+       printf("number of page faults: %d",pagefaults);
+       printf("page fault ratio : %d",pagefaults/n);
+
+    }
+    // while(emptyindex<f){
+    //     if(!isPresent(frames[emptyindex])){//page hit na ho toh
+    //     pagefaults++;
+    //     frames[emptyindex]=refstring[emptyindex];
+    //     emptyindex++;
+    //     }
+    //     else{
+    //         pagehits++;
+    //     }
+    // }
+    
+    
+    
+
+int main(){
+
+    printf("enter no of pages" );
+    scanf("%d",&n);
+    printf("enter ref string");
+    for(int i=0;i<n;i++){
+        scanf("%d",&refstring[i]);
+    }
+    printf("enter no of frames" );
+    scanf("%d",&f);
+    for(int i=0;i<f;i++){
+        frames[i]=-1;
+    }
+    pagereplacementalgo();
+    
+    return 0;
+}
+ 
