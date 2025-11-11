@@ -1,0 +1,69 @@
+#!/bin/bash
+# menu.sh - Menu-driven shell script
+
+while true; do
+    echo -e "\n------ MENU ------"
+    echo "1. Arithmetic Operations"
+    echo "2. Create Directory and File"
+    echo "3. Copy File"
+    echo "4. Rename File"
+    echo "5. Change File Permissions"
+    echo "6. List Files"
+    echo "7. Exit"
+    read -p "Enter choice: " ch
+
+    case $ch in
+    1)
+        read -p "Enter num1: " a
+        read -p "Enter num2: " b
+        echo "Addition: $((a + b))"
+        echo "Subtraction: $((a - b))"
+        echo "Multiplication: $((a * b))"
+        echo "Division: $((a / b))"
+        ;;
+    2)
+        read -p "Enter directory name: " dir
+        mkdir -p "$dir"
+        read -p "Enter file name: " file
+        touch "$dir/$file"
+        echo "Created $dir/$file"
+        ;;
+    3)
+        read -p "Source file: " src
+        read -p "Destination: " dest
+        cp "$src" "$dest"
+        echo "File copied."
+        ;;
+    4)
+        read -p "Old name: " old
+        read -p "New name: " new
+        mv "$old" "$new"
+        echo "File renamed."
+        ;;
+    5)
+        read -p "File name: " f
+        read -p "Permission (e.g. 755): " p
+        chmod "$p" "$f"
+        echo "Permission changed."
+        ;;
+    6)
+        ls -l
+        ;;
+    7)
+        echo "Exiting..."
+        exit
+        ;;
+    *)
+        echo "Invalid choice."
+        ;;
+    esac
+done
+
+
+# try using cat ,touch,nano 
+if ["$b" -eq 0];  then 
+echo "invalid" 
+else
+echo "Division: $(echo  "scale=2; $a/$b" | bc) "
+fi 
+;;
