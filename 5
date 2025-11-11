@@ -1,0 +1,55 @@
+#include<stdio.h>
+#include<unistd.h>
+//#include <pthread.h>
+#include<sys/wait.h>
+//#include <string.h>
+#include<stdlib.h>
+#define max 100
+int main(){
+    char buffer[max];
+    int pipe1[2],pipe2[2];//pipe formed before forking 
+    if(pipe(pipe1)<0|| pipe(pipe2)<0){
+        printf("pipe creation failed");
+        exit(1);
+    }
+    pid_t p=fork();
+    if(p<0){
+        printf("fork failed");
+        exit(1);
+    }
+    else if(p>0){
+        printf("parent process");
+        close(pipe1[0]);
+        close(pipe2[1]);
+        char parent_question[max];   
+        printf("enter parent question");
+        fgets(parent_question,max,stdin);
+        write(pipe1[1],parent_question,max);
+        printf("reading child's reply");
+        int n=read(pipe2[0],buffer,max);
+        buffer[n]='\0';
+        printf("%s",buffer);
+        wait(NULL);//uppercase null 
+        close(pipe1[1]);
+        close(pipe2[0]);
+    }
+    else{
+        printf("child process");
+        close(pipe1[1]);//reading from pipe 1 
+        close(pipe2[0]);
+        int n=read(pipe1[0],buffer,max);
+        buffer[n]='\0';
+        printf("child reading :%s",buffer);
+        char child_reply[max];   
+        printf("enter child reply");
+        fgets(child_reply,max,stdin);
+        // YOU FORGOT TO WRITE TO PIPE IDIOT after taking input from user 
+        write(pipe2[1],child_reply,max);
+        close(pipe1[0]);
+        close(pipe2[1]);
+        exit(0);
+    }
+    
+    
+    return 0;
+}
