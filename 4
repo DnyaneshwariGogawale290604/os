@@ -1,0 +1,61 @@
+#include<stdio.h>
+int n,at[10],bt[10],ct[10],wt[10],tat[10],Time=0,rt[10],completed=0;
+float avgwt=0,avgtat=0;
+int main(){
+    printf("enter n");
+    scanf("%d",&n);
+    printf("enter at");
+    for(int i=0;i<n;i++){
+        scanf("%d",&at[i]);
+    }
+    
+    printf("enter bt");
+    for(int i=0;i<n;i++){
+        scanf("%d",&bt[i]);
+    }
+    //dnyaneshwari you do not forget to initialise rt array 
+    for (int i=0;i<n;i++){
+        rt[i]=bt[i];
+    }
+    while(completed!=n){
+        int index=-1;
+        int minrt=1000;
+        for(int i=0;i<n;i++){
+            if(at[i]<=Time && rt[i]>0 && rt[i]<minrt ){
+                minrt=rt[i];
+                index=i;
+                
+            }
+        }//end of for loop     
+        if(index!=-1){
+                Time++;
+                rt[index]--;
+                if(rt[index]==0){
+                    completed++;
+                    ct[index]=Time;
+                    tat[index]=ct[index]-at[index];
+                    wt[index]=tat[index]-bt[index];
+                    avgtat+=tat[index];
+                    avgwt+=wt[index];
+                }
+                
+            }
+        else {
+               Time++;
+                }
+        }
+    
+    printf("process\tat\tbt\tct\ttat\twt\n");
+    for(int i=0;i<n;i++){
+    printf("%d",i);
+    printf("\t%d",at[i]);
+    printf("\t%d",bt[i]);
+    printf("\t%d",ct[i]);
+    printf("\t%d",tat[i]);
+    printf("\t%d",wt[i]);
+    printf("\n");
+    }
+    printf("avg wt: %.2f",avgwt/n);
+    printf("avg tat: %.2f",avgtat/n);
+    return 0;
+}
