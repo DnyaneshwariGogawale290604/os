@@ -1,0 +1,140 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+
+#define SIZE 5   // Buffer size
+
+int buffer[SIZE];
+int in = 0, out = 0;
+int item = 0;    // To track produced items
+int n;           // Number of producers and consumers
+
+sem_t empty, full, mutex;
+
+// ---------------- Producer Function ----------------
+void* producer(void* arg) {
+    sem_wait(&empty);    // Wait if buffer is full
+    sem_wait(&mutex);    // Enter critical section
+
+    item++;
+    buffer[in] = item;
+    printf("\nProducer produced item %d at position %d", item, in);
+    in = (in + 1) % SIZE;
+
+    sem_post(&mutex);    // Leave critical section
+    sem_post(&full);     // Signal that buffer has a new item
+
+    sleep(1); // Simulate production time
+    return NULL;//pthread_exit(NULL);
+}
+
+// ---------------- Consumer Function ----------------
+void* consumer(void* arg) {
+    sem_wait(&full);     // Wait if buffer is empty
+    sem_wait(&mutex);    // Enter critical section
+
+    int consumed_item = buffer[out];
+    printf("\nConsumer consumed item %d from position %d", consumed_item, out);
+    out = (out + 1) % SIZE;
+
+    sem_post(&mutex);    // Leave critical section
+    sem_post(&empty);    // Signal that a slot is empty
+
+    sleep(1); // Simulate consumption time
+    return NULL; ;//pthread_exit(NULL);
+
+}
+
+// ---------------- Main Function ----------------
+int main() {
+    int i;
+    pthread_t prod_thread[100], cons_thread[100];
+
+    printf("Enter number of producers and consumers: ");
+    scanf("%d", &n);
+
+    // Initialize semaphores
+    sem_init(&empty, 0, SIZE);  // Initially all slots empty
+    sem_init(&full, 0, 0);      // No items initially
+    sem_init(&mutex, 0, 1);     // Binary semaphore for mutual exclusion
+
+    // Create producer and consumer threads
+    for (i = 0; i < n; i++) {
+        pthread_create(&prod_thread[i], NULL, producer, NULL);
+        pthread_create(&cons_thread[i], NULL, consumer, NULL);
+    }
+
+    // Wait for threads to finish
+    for (i = 0; i < n; i++) {
+        pthread_join(prod_thread[i], NULL);
+        pthread_join(cons_thread[i], NULL);
+    }
+
+    sem_destroy(&empty);
+    sem_destroy(&full);
+    sem_destroy(&mutex);
+
+    printf("\nAll producers and consumers have finished.\n");
+    return 0;
+}  
+#include <stdio.h>
+#include <pthread.h>
+#include<semaphore.h>
+#include <unistd.h>//portable operating sys interface posix 
+#include <stdlib.h>//exit calls 
+pthread_t readers[5],writers[5];//pthread type and not pid type 
+int n;
+sem_t mutex,wrt;
+int sharedvar=10;
+int count=0;
+void* reader(void* arg){//note func return type void * and not just void 
+    sem_wait(&mutex);
+    count++;
+    if(count==1){
+        sem_wait(&wrt);
+    }
+    //typecaste arg as long int or int and accordingly write %d or %ld 
+    sem_post(&mutex);
+    printf("reader %ld is trying to enter",(long)arg);
+    printf("reader %ld is reading the value as %d",(long)arg,sharedvar);//shared val  
+    printf("reader %ld is exiting",(long)arg);
+    sem_wait(&mutex);
+    count--;
+    if(count==0){
+        sem_post(&wrt);
+    }
+    sem_post(&mutex);
+    pthread_exit(NULL); );//DO NOT FORGET
+}
+void* writer(void* arg){
+    printf("writer %ld is trying to enter",(long)arg);
+    sem_wait(&wrt);
+    printf("writer %ld is updating the value",(long)arg);
+    sharedvar+=10;
+    printf("writer %ld updated the value to %d",(long)arg,sharedvar);
+    printf("writer is exiting");
+    sem_post(&wrt);
+   pthread_exit(NULL);//DO NOT FORGET 
+}
+int main(){
+   // sem_t mutex,wrt;
+    sem_init(&mutex,0,1);
+    sem_init(&wrt,0,1);
+    printf("enter number of therads sharing the mem addres space");
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        pthread_create(&readers[i],NULL,reader,(void*)(long)i);
+        pthread_create(&writers[i],NULL,writer,(void*)(long)i);//you are accidentally called reader again here 
+    }
+    for(int i=0;i<n;i++){
+        pthread_join(readers[i],NULL);
+        pthread_join(writers[i],NULL);
+    }
+    //do not forget 
+    sem_destroy(&mutex);
+    sem_destroy(&wrt);
+return 0;    
+}
+ 
